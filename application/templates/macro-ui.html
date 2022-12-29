@@ -1,0 +1,9 @@
+{% macro icon(icon_name, tooltip) %}
+<i class="bi bi-{{ icon_name }}"
+   {% if tooltip  %}
+   data-bs-toggle="tooltip"
+   data-bs-placement="{{ tooltip.p }}"
+   title="{{ tooltip.l }}"
+   {% endif %}>
+</i>
+{% endmacro %}
