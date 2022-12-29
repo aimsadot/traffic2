@@ -3,6 +3,19 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+#custom
+.idea
+
+uploads
+clips
+records
+instance
+
+*.db
+
+*.avi
+*.mp4
+
 # C extensions
 *.so
 
