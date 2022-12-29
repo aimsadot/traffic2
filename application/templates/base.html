@@ -67,7 +67,7 @@
 
     </nav>
     <div id="main" class="d-flex col flex-column">
-        <section id="page-ops" class="page-head border-bottom mb-2">
+        <section id="page-ops" class="page-head border-bottom mb-1">
             <div class="row">
                 <h5 class="col text-uppercase pt-2 pb-0">
                     {{ icon(vars['page-icon']) }}
@@ -80,15 +80,15 @@
         </section>
         <section id="page-body" class="col d-flex flex-column">
             {% if vars['no-mid'] == false %}
-            <div class="row">
-                <div class="col-{{ vars['col-1'] }} ">
+            <div class="row mb-1">
+                <div class="col-{{ vars['col-1'] }} pe-0">
                     <div class="card rounded-0">
                         <div class="card-body h-100">
                             {% block content_top_left %}{% endblock %}
                         </div>
                     </div>
                 </div>
-                <div class="col-{{ vars['col-2'] }}">
+                <div class="col-{{ vars['col-2'] }} ps-1">
                     <div class="card rounded-0 h-100">
                         <div class="card-body">
                             {% block content_top_right %}{% endblock %}
@@ -99,7 +99,7 @@
             {% endif %}
             <div class="row col">
                 <div class="col d-flex">
-                    <div class="card col mb-2 mt-2 rounded-0">
+                    <div class="card col mb-1 rounded-0">
                         {% block card_head %}{% endblock %}
                         {% block content_bottom %}
                             page content will go here...
