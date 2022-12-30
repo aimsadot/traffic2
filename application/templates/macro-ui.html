@@ -30,7 +30,7 @@
 
 {% macro pass_field(name='password', label='Password') %}
 {% set field_id = 'field-'+name+'-'+random_int(1)  -%}
-{{ text_field(field_id, name, 'password', label, 'Password' ) }}
+{{ text_field(field_id, 'password', name, label, 'Password' ) }}
 {% endmacro %}
 
 {% macro print_toast() %}
