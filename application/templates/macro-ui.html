@@ -1,3 +1,10 @@
+{% macro random_int(len) -%}
+  {% for n in range(len) %}
+    {{[0,1,2,3,4,5,6,7,8,9]|random}}
+  {% endfor %}
+{%- endmacro %}
+
+
 {% macro icon(icon_name, tooltip) %}
 <i class="bi bi-{{ icon_name }}"
    {% if tooltip  %}
@@ -6,4 +13,21 @@
    title="{{ tooltip.l }}"
    {% endif %}>
 </i>
+{% endmacro %}
+
+{% macro text_field(field_id_text, type, name, label, ph) %}
+<div class="form-floating mb-3">
+    <input name="{{ name }}" type="{{ type }}" class="form-control" id="{{ field_id_text }}" placeholder="{{ ph }}" required>
+    <label for="{{ field_id_text }}">{{ label }}</label>
+</div>
+{% endmacro %}
+
+{% macro email_field(name='email', label='Email Address') %}
+{% set field_id = 'field-'+name+'-'+random_int(1) %}
+{{ text_field(field_id, 'email', name, label, 'name@example.com' ) }}
+{% endmacro %}
+
+{% macro pass_field(name='password', label='Password') %}
+{% set field_id = 'field-'+name+'-'+random_int(1)  -%}
+{{ text_field(field_id, name, 'password', label, 'Password' ) }}
 {% endmacro %}

@@ -37,3 +37,20 @@ body {
     padding-right: 20px;
 }
 
+#auth-main{
+    width: 10vw;
+    min-width: 400px;
+}
+
+#auth-main .card-title{
+font-family: "Audiowide", sans-serif;
+}
+
+#auth-main .login .auth-icon{
+
+}
+
+.auth-icon{
+    font-size: 8rem;
+}
+
