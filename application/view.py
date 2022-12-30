@@ -5,8 +5,6 @@ view = Blueprint('view', __name__)
 
 @view.route('/')
 def home():
-    flash('Check Errror', category='error')
-    flash('Check Succ', category='success')
     return render_template("home.html")
 
 
