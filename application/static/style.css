@@ -54,3 +54,7 @@ font-family: "Audiowide", sans-serif;
     font-size: 8rem;
 }
 
+.toast-container{
+    z-index: 1;
+}
+

@@ -20,4 +20,16 @@
     tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl)
     })
+
+
+    let toastElList = [].slice.call(document.querySelectorAll('.toast'))
+    toastElList.map(function (toastEl) {
+        return new bootstrap.Toast(toastEl, 'autohide')
+    })
+
+
 })()
+
+$(document).ready(function () {
+    $(".toast").toast('show');
+});
