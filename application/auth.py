@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, flash, request, redirect, url_for
 from .dataAccess import get_user_by_email, add_user, check_user_password
-from flask_login import login_user, login_required, logout_user, current_user
+from flask_login import login_user, login_required, logout_user
 from . import FLASH_ERROR, FLASH_SUCCESS
 
 auth = Blueprint('auth', __name__)
