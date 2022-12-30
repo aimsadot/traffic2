@@ -4,43 +4,133 @@
 {% block page_ops %}
 <ul class="nav nav-tabs border-0" id="myTab" role="tablist">
     <li class="nav-item" role="presentation">
-        <button class="nav-link active pb-2 pt-2 rounded-0" id="rtsp-tab" data-bs-toggle="tab"
+        <button class="nav-link pb-2 pt-2 rounded-0" id="rtsp-tab" data-bs-toggle="tab"
                 data-bs-target="#rtsp-table-container" type="button"
-                role="tab" aria-controls="rtsp-table-container" aria-selected="true">RTSP Links
+                role="tab" aria-controls="rtsp-table-container" aria-selected="true"
+                data-card-header-text="RTSP Link to Analyse" , data-card-icon="abc">RTSP Links
         </button>
     </li>
     <li class="nav-item" role="presentation">
         <button class="nav-link  pb-2 pt-2  rounded-0" id="video-tab" data-bs-toggle="tab"
                 data-bs-target="#video-table-container" type="button"
-                role="tab" aria-controls="video-table-container" aria-selected="false">Video for Analytics
+                role="tab" aria-controls="video-table-container" aria-selected="false"
+                data-card-header-text="Video for Analytics" , data-card-icon="abc">Video for Analytics
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link  pb-2 pt-2 link-secondary rounded-0" id="area-tab" data-bs-toggle="tab"
+        <button class="nav-link active pb-2 pt-2 rounded-0" id="area-tab" data-bs-toggle="tab"
                 data-bs-target="#area-table-container" type="button"
-                role="tab" aria-controls="area-table-container" aria-selected="false">Area
+                role="tab" aria-controls="area-table-container" aria-selected="false"
+                data-card-header-text="Area to Monitor" , data-card-icon="abc">Area
         </button>
     </li>
 </ul>
 {% endblock %}
 {% block card_head %}
 <div class="card-header bg-light bg-gradient">
-    card header
+    <div class="row">
+        <div class="col" id="settings-card-header">
+            <span></span>
+        </div>
+        <div class="col"></div>
+    </div>
 </div>
 {% endblock %}
 {% block content_bottom %}
 <div class="card-body ">
     <div class="tab-content">
-        <div class="tab-pane active" id="rtsp-table-container" role="tabpanel"
+        <div class="tab-pane" id="rtsp-table-container" role="tabpanel"
              aria-labelledby="rtsp-table-container-tab">
-                    {% include 'ops-rtsp.html' %}
+            {% include 'ops-rtsp.html' %}
         </div>
         <div class="tab-pane" id="video-table-container" role="tabpanel" aria-labelledby="video-table-container-tab">
             {% include 'ops-video.html' %}
         </div>
-        <div class="tab-pane" id="area-table-container" role="tabpanel" aria-labelledby="area-table-container-tab">
-            {% include 'ops-area.html' %}
+        <div class="tab-pane active" id="area-table-container" role="tabpanel"
+             aria-labelledby="area-table-container-tab">
+            <div id="area-table" class="dynamic-table"></div>
         </div>
     </div>
 </div>
+{% include 'ops-area.html' %}
+{%- endblock -%}
+{% block page_script %}
+<script type="module">
+    import {BaseComponent, PluginPosition, h} from "https://unpkg.com/gridjs?module";
+
+    class AddButtonPlugin extends BaseComponent {
+        clickEvent = () => {
+            this.config.eventEmitter.emit('custom-event', true)
+        }
+
+        render() {
+            return h(
+                'div',
+                {class: 'd-flex justify-content-end align-items-center col'},
+                [
+                    h('button', {class: 'btn text-secondary fs-2', onClick: this.clickEvent}, [
+                        h('i', {class: 'bi bi-plus-square-fill'})
+                    ])
+                ]
+            );
+
+        }
+    }
+
+    const grid = new gridjs.Grid({
+        columns: ['Name', 'Age', 'Email'],
+        search: true,
+        className: {
+            header: 'd-flex flex-row'
+        },
+        data: [
+            ['John', 25, 'john@k.com'],
+            ['Mark', 59, 'mark@e.com'],
+        ],
+    }).render(document.getElementById("area-table"));
+
+    grid.plugin.add({
+        id: 'add_button_plugin',
+        component: AddButtonPlugin,
+        position: PluginPosition.Header,
+    });
+
+    grid.on('custom-event', function (event) {
+        let myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {
+            keyboard: false
+        });
+        myModal.show();
+    })
+</script>
+
+<script type="text/javascript">
+    const CARD_HEADER_TEXT_FROM_TAB = 'data-card-header-text';
+    const SETTINGS_CARD_HEADER_SPAN = '#settings-card-header span';
+    const TAB_ACTIVE_CLASS = 'active';
+
+    function update_header(text) {
+        $(SETTINGS_CARD_HEADER_SPAN).text(text)
+    }
+
+    function get_data_card_header_text_of_tab(tab) {
+        return tab.attr(CARD_HEADER_TEXT_FROM_TAB)
+    }
+
+    $(document).ready(function () {
+
+        $('button[data-bs-toggle="tab"]').each(function (index, tab) {
+            if ($(tab).hasClass(TAB_ACTIVE_CLASS)) {
+                let text = get_data_card_header_text_of_tab($(tab));
+                update_header(text)
+            }
+        })
+
+        $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (event) {
+            let text = get_data_card_header_text_of_tab($(event.target));
+            update_header(text)
+        })
+    });
+
+
+</script>
 {%- endblock -%}

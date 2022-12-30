@@ -27,9 +27,29 @@
         return new bootstrap.Toast(toastEl, 'autohide')
     })
 
+    function create_map(id, options) {
+        let cord = [23.7696, 90.3576]
+        if (options.cord) {
+            cord = options.cord
+        }
 
+        return L.map(id, {
+            center: cord,
+            zoom: 17,
+            zoomControl: false,
+            dragging: true,
+            maxZoom: 19,
+            minZoom: 17
+        });
+    }
+
+    function addMap(id, options, callBack) {
+
+    }
+
+
+    $(document).ready(function () {
+        $(".toast").toast('show');
+    });
 })()
 
-$(document).ready(function () {
-    $(".toast").toast('show');
-});

@@ -6,6 +6,8 @@ body {
     z-index:  0;
 }
 
+
+
 #top-nav-bar{
     height: 50px;
 }
@@ -56,5 +58,9 @@ font-family: "Audiowide", sans-serif;
 
 .toast-container{
     z-index: 1;
+}
+
+.dynamic-table div{
+    border-radius: 0!important;
 }
 

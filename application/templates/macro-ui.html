@@ -23,6 +23,7 @@
 </div>
 {% endmacro %}
 
+
 {% macro email_field(name='email', label='Email Address') %}
 {% set field_id = 'field-'+name+'-'+random_int(1) %}
 {{ input_field(field_id, 'email', name, label, 'name@example.com' ) }}
