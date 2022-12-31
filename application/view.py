@@ -13,4 +13,4 @@ def home():
 @view.route('/settings')
 @login_required
 def settings():
-    return render_template("settings.html")
+    return render_template("settings.html", areas=[])

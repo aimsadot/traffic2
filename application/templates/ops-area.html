@@ -1,5 +1,4 @@
-{% from 'macro-ui.html' import icon, print_toast %}
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="areaModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -8,14 +7,17 @@
             </div>
             <div class="modal-body">
                 <form>
-                    <input type="hidden" name="lat">
-                    <input type="hidden" name="lng">
-                    <div id="area-map" class="my-map"></div>
+                    <input type="hidden" name="area_lat">
+                    <input type="hidden" name="area_lng">
+                    <input type="hidden" name="area_name">
+                    <input type="hidden" name="description">
+                    <div id="area-map" class="my-map" style="height: 250px;"></div>
+                    <div class="alert alert-success visually-hidden mt-2" id="area-info"></div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Send message</button>
+                <button type="button" id="area_save_button" class="btn btn-primary">Save</button>
             </div>
         </div>
     </div>

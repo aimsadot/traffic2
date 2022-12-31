@@ -23,6 +23,10 @@
 </div>
 {% endmacro %}
 
+{% macro text_field(name, label, place_holder='') %}
+{% set field_id = 'field-'+name+'-'+random_int(1) %}
+{{ input_field(field_id, 'text', name, label, place_holder )}}
+{% endmacro %}
 
 {% macro email_field(name='email', label='Email Address') %}
 {% set field_id = 'field-'+name+'-'+random_int(1) %}
@@ -32,6 +36,20 @@
 {% macro pass_field(name='password', label='Password') %}
 {% set field_id = 'field-'+name+'-'+random_int(1)  -%}
 {{ input_field(field_id, 'password', name, label, 'Password' ) }}
+{% endmacro %}
+
+{% macro select_field_area(select_field_id1, extra_cls, label, name, options) %}
+<div class="mb-3">
+    <div class="form-floating">
+        <select id="{{ select_field_id1 }}" class="form-select" aria-label="{{ label }}" name="{{ name }}" required>
+            <option selected>Select an area</option>
+            {% for item in options %}
+            <option value="{{item['id']}}" data-lat="{{item.lat}}" data-long="{{item.lng}}">{{item['name']}}</option>
+            {% endfor %}
+        </select>
+        <label for="{{ select_field_id1 }}" class="form-label">{{ label }}</label>
+    </div>
+</div>
 {% endmacro %}
 
 {% macro print_toast() %}

@@ -4,7 +4,7 @@
 {% block page_ops %}
 <ul class="nav nav-tabs border-0" id="myTab" role="tablist">
     <li class="nav-item" role="presentation">
-        <button class="nav-link pb-2 pt-2 rounded-0" id="rtsp-tab" data-bs-toggle="tab"
+        <button class="nav-link active pb-2 pt-2 rounded-0" id="rtsp-tab" data-bs-toggle="tab"
                 data-bs-target="#rtsp-table-container" type="button"
                 role="tab" aria-controls="rtsp-table-container" aria-selected="true"
                 data-card-header-text="RTSP Link to Analyse" , data-card-icon="abc">RTSP Links
@@ -18,7 +18,7 @@
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link active pb-2 pt-2 rounded-0" id="area-tab" data-bs-toggle="tab"
+        <button class="nav-link pb-2 pt-2 rounded-0" id="area-tab" data-bs-toggle="tab"
                 data-bs-target="#area-table-container" type="button"
                 role="tab" aria-controls="area-table-container" aria-selected="false"
                 data-card-header-text="Area to Monitor" , data-card-icon="abc">Area
@@ -39,74 +39,133 @@
 {% block content_bottom %}
 <div class="card-body ">
     <div class="tab-content">
-        <div class="tab-pane" id="rtsp-table-container" role="tabpanel"
+        <div class="tab-pane active" id="rtsp-table-container" role="tabpanel"
              aria-labelledby="rtsp-table-container-tab">
-            {% include 'ops-rtsp.html' %}
+            <div id="rtsp-table" class="dynamic-table"></div>
         </div>
         <div class="tab-pane" id="video-table-container" role="tabpanel" aria-labelledby="video-table-container-tab">
-            {% include 'ops-video.html' %}
+            <div id="video-table" class="dynamic-table"></div>
         </div>
-        <div class="tab-pane active" id="area-table-container" role="tabpanel"
+        <div class="tab-pane" id="area-table-container" role="tabpanel"
              aria-labelledby="area-table-container-tab">
             <div id="area-table" class="dynamic-table"></div>
         </div>
     </div>
 </div>
 {% include 'ops-area.html' %}
+{% include 'ops-rtsp.html' %}
+{% include 'ops-video.html' %}
 {%- endblock -%}
 {% block page_script %}
 <script type="module">
-    import {BaseComponent, PluginPosition, h} from "https://unpkg.com/gridjs?module";
+    import {AddButtonPlugin} from "{{ url_for('static', filename='gridjsplugin.js') }}"
+    import {PluginPosition} from "https://unpkg.com/gridjs?module";
 
-    class AddButtonPlugin extends BaseComponent {
-        clickEvent = () => {
-            this.config.eventEmitter.emit('custom-event', true)
-        }
 
-        render() {
-            return h(
-                'div',
-                {class: 'd-flex justify-content-end align-items-center col'},
-                [
-                    h('button', {class: 'btn text-secondary fs-2', onClick: this.clickEvent}, [
-                        h('i', {class: 'bi bi-plus-square-fill'})
-                    ])
-                ]
-            );
+    const VISUALLY_HIDDEN = 'visually-hidden';
 
-        }
-    }
-
-    const grid = new gridjs.Grid({
-        columns: ['Name', 'Age', 'Email'],
-        search: true,
-        className: {
-            header: 'd-flex flex-row'
-        },
-        data: [
-            ['John', 25, 'john@k.com'],
-            ['Mark', 59, 'mark@e.com'],
-        ],
-    }).render(document.getElementById("area-table"));
-
-    grid.plugin.add({
-        id: 'add_button_plugin',
-        component: AddButtonPlugin,
-        position: PluginPosition.Header,
-    });
-
-    grid.on('custom-event', function (event) {
-        let myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {
-            keyboard: false
-        });
-        myModal.show();
-    })
-</script>
-
-<script type="text/javascript">
     const CARD_HEADER_TEXT_FROM_TAB = 'data-card-header-text';
     const SETTINGS_CARD_HEADER_SPAN = '#settings-card-header span';
     const TAB_ACTIVE_CLASS = 'active';
+    const AREA_TABLE = 'area-table';
+    const VIDEO_TABLE = 'video-table';
+    const RTSP_TABLE = 'rtsp-table';
+    const dummay_data = [
+        ['John', 25, 'john@k.com'],
+        ['Mark', 59, 'mark@e.com'],
+    ]
+
+    function createGrid(tableDomId) {
+        const grid = new gridjs.Grid({
+            columns: ['Name', 'Age', 'Email'],
+            search: true,
+            className: {
+                header: 'd-flex flex-row'
+            },
+            data: dummay_data,
+        }).render(document.getElementById(tableDomId));
+
+        grid.plugin.add({
+            id: tableDomId + "_add_button",
+            component: AddButtonPlugin,
+            position: PluginPosition.Header,
+        });
+
+        return grid;
+    }
+
+
+    const areaGrid = createGrid(AREA_TABLE);
+    const rtspGrid = createGrid(RTSP_TABLE);
+    const videoGrid = createGrid(VIDEO_TABLE);
+
+    videoGrid.on('plus-item', function (){
+         const MODAL_ID = 'videoModal';
+        const MAP_ELEMENT_ID = 'video-map';
+        let myModal = createModal(MODAL_ID);
+        let myModalEl = getElementOfModal(MODAL_ID);
+        myModalEl.addEventListener('shown.bs.modal', function (event) {
+            let mapOptions = {
+                showSearch: false,
+                minZoom: 15
+            };
+
+            addMap(MAP_ELEMENT_ID, mapOptions);
+        });
+         myModal.show();
+    });
+
+    rtspGrid.on('plus-item', function (){
+        const MODAL_ID = 'rtspModal';
+        const MAP_ELEMENT_ID = 'rtsp-map';
+        let myModal = createModal(MODAL_ID);
+        let myModalEl = getElementOfModal(MODAL_ID);
+
+        myModalEl.addEventListener('shown.bs.modal', function (event) {
+            let mapOptions = {
+                showSearch: false,
+                minZoom: 15
+            };
+
+            addMap(MAP_ELEMENT_ID, mapOptions);
+        });
+         myModal.show();
+    });
+
+
+    areaGrid.on('plus-item', function (event) {
+        const MODAL_ID = 'areaModal';
+        const MAP_ELEMENT_ID = 'area-map';
+        const AREA_INFO = '#area-info';
+        const INPUT_AREA_NAME = 'area_name'
+        const INPUT_AREA_DESCRIPTION = 'description';
+        const INPUT_AREA_LAT = "area_lat";
+        const INPUT_AREA_LNG = "area_lng";
+
+        let myModal = createModal(MODAL_ID);
+        let myModalEl = getElementOfModal(MODAL_ID)
+
+        myModalEl.addEventListener('shown.bs.modal', function (event) {
+            let mapOptions = {
+                showSearch: true,
+                minZoom: 11
+            }
+            addMap(MAP_ELEMENT_ID, mapOptions, function (vals) {
+                let lat = vals.y;
+                let lng = vals.x;
+                let areaName = vals.label.split(",")[0];
+                let description = vals.label;
+                $(AREA_INFO).html("Area Name: " + areaName + " <br> Full Address: " + description);
+                $(AREA_INFO).removeClass(VISUALLY_HIDDEN);
+                updateIputField(INPUT_AREA_NAME, areaName);
+                updateIputField(INPUT_AREA_DESCRIPTION, description);
+                updateIputField(INPUT_AREA_LNG, lng);
+                updateIputField(INPUT_AREA_LAT, lat);
+            });
+        })
+        myModal.show();
+    })
+
 
     function update_header(text) {
         $(SETTINGS_CARD_HEADER_SPAN).text(text)
@@ -130,7 +189,5 @@
             update_header(text)
         })
     });
-
-
 </script>
 {%- endblock -%}

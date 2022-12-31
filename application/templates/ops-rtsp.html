@@ -1,1 +1,28 @@
-hello rtsp
+{% from 'macro-ui.html' import icon, text_field, select_field_area %}
+<div class="modal fade" id="rtspModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add a RTSP stream link</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    {{ text_field('name', 'Name', 'RTSP Link Name') }}
+                    {{ text_field('rtsp_link', 'RTSP Link', 'rtsp://..') }}
+                    {{ select_field_area("select-area-for-rtsp", "", "Select Area", "area_id", areas ) }}
+                    <div class="mb-3">
+                        <label for="rtsp-map">Click on map after selecting an area for link location</label>
+                        <div id="rtsp-map" class="my-map mb-3 col" style="min-height: 250px;"></div>
+                    </div>
+                    <input type="hidden" name="rtsp_lat">
+                    <input type="hidden" name="rtsp_lng">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="area_save_button" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
