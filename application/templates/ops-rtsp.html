@@ -8,10 +8,10 @@
             </div>
             <form method="post" action="{{ url_for('view.settings') }}">
                 <div class="modal-body">
-                    <input type="hidden" name="mod" value="upload_rtsp"/>
+                    <input type="hidden" name="mod" value="add_rtsp"/>
                     {{ text_field('name', 'Name', 'RTSP Link Name') }}
                     {{ text_field('rtsp_link', 'RTSP Link', 'rtsp://..') }}
-                    {{ select_field_area("select-area-for-rtsp", "", "Select Area", "area_id", 'abc.com' ) }}
+                    {{ select_field_area("select-area-for-rtsp", "", "Select Area", "area_id", areas) }}
                     <div class="mb-3">
                         <label for="rtsp-map">Click on map after selecting an area for link location</label>
                         <div id="rtsp-map" class="my-map mb-3 col" style="min-height: 250px;"></div>

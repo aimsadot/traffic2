@@ -5,15 +5,9 @@
 {%- endmacro %}
 
 
-{% macro icon(icon_name, tooltip) %}
-<i class="bi bi-{{ icon_name }}"
-   {% if tooltip %}
-   data-bs-toggle="tooltip"
-   data-bs-placement="{{ tooltip.p }}"
-   title="{{ tooltip.l }}"
-   {% endif %}>
-</i>
-{% endmacro %}
+{%- macro icon(icon_name, tooltip) %}<i class="bi bi-{{ icon_name }}" {% if tooltip %} data-bs-toggle="tooltip"
+                                        data-bs-placement="{{ tooltip.p }}" title="{{ tooltip.l }}" {%- endif -%}></i>
+{%- endmacro -%}
 
 {% macro input_field(field_id_text, type, name, label, ph) %}
 <div class="form-floating mb-3">
@@ -38,11 +32,15 @@
 {{ input_field(field_id, 'password', name, label, 'Password' ) }}
 {% endmacro %}
 
-{% macro select_field_area(select_field_id1, extra_cls, label, name, url) %}
+{% macro select_field_area(select_field_id1, extra_cls, label, name, options) %}
 <div class="mb-3">
-    <div class="form-floating">
-        <select data-url="{{ url }}" id="{{ select_field_id1 }}" class="form-select basic-auto" aria-label="{{ label }}" name="{{ name }}" required>
-
+    <div class="form-floating select-field">
+        <select data-url="{{ url }}" id="{{ select_field_id1 }}" class="form-select basic-auto" aria-label="{{ label }}"
+                name="{{ name }}" required>
+            <option selected>Select a area</option>
+            {% for item in options %}
+            <option value="{{item['id']}}" data-lat="{{item.lat}}" data-long="{{item.lng}}">{{item['name']}}</option>
+            {% endfor %}
         </select>
         <label for="{{ select_field_id1 }}" class="form-label">{{ label }}</label>
     </div>
@@ -55,7 +53,8 @@
 <div aria-live="polite" aria-atomic="true">
     <div class="toast-container position-absolute top-0 end-0 p-3">
         {% for category, message in messages %}
-        <div class="toast bg-{{ 'danger' if category == 'error' else 'success' }}" role="alert" aria-live="assertive"
+        <div class="toast tst-msg bg-{{ 'danger' if category == 'error' else 'success' }}" role="alert"
+             aria-live="assertive"
              aria-atomic="true">
             <div class="toast-header">
                 {{ icon('emoji-frown') if category == 'error' else icon('emoji-smile') }}
@@ -71,4 +70,17 @@
 </div>
 {% endif %}
 {% endwith %}
+{% endmacro %}
+
+{% macro alert_toast() %}
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <span></span>
+            <strong class="me-auto">Server Response</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body"></div>
+    </div>
+</div>
 {% endmacro %}

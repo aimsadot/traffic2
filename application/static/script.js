@@ -52,6 +52,39 @@ function location_update(e) {
     callBack(e.location);
 }
 
+function place_marker(map, cords, options) {
+    let markers = []
+    cords.forEach(function (cord) {
+        let marker = L.marker(cord, {
+            draggable: false,
+            autoPan: true
+        }).addTo(map);
+        markers.push(marker)
+    })
+    return markers;
+
+}
+
+function map_clicked(e) {
+    let domId = e.sourceTarget._container.id;
+    let map = maps.get(domId).map
+    let options = maps.get(domId).options
+    if (options.marker){
+        options.marker.setLatLng(e.latlng)
+    }else{
+        let markers = place_marker(map, [[e.latlng.lat, e.latlng.lng]], options);
+        options.marker = markers[0]
+    }
+    if(maps.get(domId).callBack){
+        maps.get(domId).callBack(e)
+    }
+
+}
+
+function pan_map(map, latlng) {
+    map.panTo(latlng);
+}
+
 function addMap(id, options, callBack) {
     if (maps.has(id)) {
         return maps.get(id);
@@ -69,9 +102,10 @@ function addMap(id, options, callBack) {
         map.on('geosearch/showlocation', location_update);
     }
 
-    map.on('click', function (e) {
-        console.log(e)
-    })
+    if (options && options.placeMarker) {
+        map.on('click', map_clicked)
+    }
+
 
     setTimeout(function () {
         map.invalidateSize(true);
@@ -84,14 +118,19 @@ function updateIputField(name, value) {
     $("input[name=" + name + "]").val(value);
 }
 
-function createModal(modalId){
+function createModal(modalId) {
     let myModal = new bootstrap.Modal(document.getElementById(modalId), {
-            keyboard: false
-        });
+        keyboard: false
+    });
     return myModal;
 }
 
-function getElementOfModal(modalId){
+function getModal(modalId) {
+    let myModalEl = document.getElementById(modalId)
+    return bootstrap.Modal.getInstance(myModalEl)
+}
+
+function getElementOfModal(modalId) {
     return document.getElementById(modalId);
 }
 
@@ -125,7 +164,7 @@ function getElementOfModal(modalId){
     })
 
     $(document).ready(function () {
-        $(".toast").toast('show');
+        $(".tst-msg").toast('show');
     });
 })()
 

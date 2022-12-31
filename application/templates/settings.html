@@ -55,14 +55,21 @@
 {% include 'ops-area.html' %}
 {% include 'ops-rtsp.html' %}
 {% include 'ops-video.html' %}
+{% from 'macro-ui.html' import alert_toast, icon %}
+{{ alert_toast() }}
 {%- endblock -%}
 {% block page_script %}
 <script type="module">
     import {AddButtonPlugin} from "{{ url_for('static', filename='gridjsplugin.js') }}"
-    import {PluginPosition} from "https://unpkg.com/gridjs?module";
-
+    import {PluginPosition, h} from "https://unpkg.com/gridjs?module";
 
     const VISUALLY_HIDDEN = 'visually-hidden';
+    const ERROR_ICON = '{{ icon("emoji-frown") }}'
+    const SUCCESS_ICON = '{{ icon("emoji-smile") }}'
+
+    const AREA_MODAL_ID = 'areaModal'
+    const RTSP_MODAL_ID = 'rtspModal'
+    const VIDEO_MODAL_ID = 'videoModal'
 
     const CARD_HEADER_TEXT_FROM_TAB = 'data-card-header-text';
     const SETTINGS_CARD_HEADER_SPAN = '#settings-card-header span';
@@ -70,19 +77,16 @@
     const AREA_TABLE = 'area-table';
     const VIDEO_TABLE = 'video-table';
     const RTSP_TABLE = 'rtsp-table';
-    const dummay_data = [
-        ['John', 25, 'john@k.com'],
-        ['Mark', 59, 'mark@e.com'],
-    ]
 
-    function createGrid(tableDomId) {
+
+    function createGrid(tableDomId, columns, server) {
         const grid = new gridjs.Grid({
-            columns: ['Name', 'Age', 'Email'],
+            columns: columns,
             search: true,
             className: {
                 header: 'd-flex flex-row'
             },
-            data: dummay_data,
+            server: server
         }).render(document.getElementById(tableDomId));
 
         grid.plugin.add({
@@ -95,46 +99,102 @@
     }
 
 
-    const areaGrid = createGrid(AREA_TABLE);
-    const rtspGrid = createGrid(RTSP_TABLE);
-    const videoGrid = createGrid(VIDEO_TABLE);
+    const areaGrid = createGrid(AREA_TABLE, ['#',
+        'Name', "Description", "Created By", "Creaed At",
+        {
+            name: 'Actions',
+            formatter: (cell, row) => {
+                return h('div', {className: 'text-center'}, [
+                    h('i', {
+                        className: 'bi bi-eye fs-5 text-center',
+                        onClick: () => alert(`Editing "${row.cells[0].data}" "${row.cells[1].data}"`)
+                    }, '')
+                ])
+            }
+        }], {
+        url: '{{ url_for("view.area_list") }}',
+        then: data => data.map(card => [card.sl, card.name, card.description, card.created_by, card.created_at])
+    });
+    const rtspGrid = createGrid(RTSP_TABLE, [], {
+        url: '{{ url_for("view.area_list") }}',
+        then: data => data.map(card => [card.name, card.lang, card.released_at, card.artist])
+    });
+    const videoGrid = createGrid(VIDEO_TABLE, [], {
+        url: '{{ url_for("view.area_list") }}',
+        then: data => data.map(card => [card.name, card.lang, card.released_at, card.artist])
+    });
+
 
     videoGrid.on('plus-item', function () {
-        const MODAL_ID = 'videoModal';
+        const MODAL_ID = VIDEO_MODAL_ID;
         const MAP_ELEMENT_ID = 'video-map';
+        const INPUT_LAT = "video_lat";
+        const INPUT_LNG = "video_lng";
         let myModal = createModal(MODAL_ID);
         let myModalEl = getElementOfModal(MODAL_ID);
+        let map = null
         myModalEl.addEventListener('shown.bs.modal', function (event) {
             let mapOptions = {
                 showSearch: false,
-                minZoom: 15
+                minZoom: 15,
+                placeMarker: true
             };
 
-            addMap(MAP_ELEMENT_ID, mapOptions);
+            map = addMap(MAP_ELEMENT_ID, mapOptions, function (event) {
+                updateIputField(INPUT_LNG, event.latlng.lat);
+                updateIputField(INPUT_LAT, event.latlng.lng);
+            });
         });
         myModal.show();
+
+        $("#select-area-for-video").change(function () {
+            let lat = null;
+            let lng = null;
+            $("#select-area-for-video option:selected").each(function () {
+                lat = $(this).attr('data-lat')
+                lng = $(this).attr('data-long')
+            });
+            pan_map(map, [lat, lng]);
+        });
     });
 
     rtspGrid.on('plus-item', function () {
-        const MODAL_ID = 'rtspModal';
+        const MODAL_ID = RTSP_MODAL_ID;
         const MAP_ELEMENT_ID = 'rtsp-map';
+        const INPUT_LAT = "rtsp_lat";
+        const INPUT_LNG = "rtsp_lng";
         let myModal = createModal(MODAL_ID);
         let myModalEl = getElementOfModal(MODAL_ID);
+        let map = null
 
         myModalEl.addEventListener('shown.bs.modal', function (event) {
             let mapOptions = {
                 showSearch: false,
-                minZoom: 15
+                minZoom: 15,
+                placeMarker: true
             };
 
-            addMap(MAP_ELEMENT_ID, mapOptions);
+            map = addMap(MAP_ELEMENT_ID, mapOptions, function (event) {
+                updateIputField(INPUT_LNG, event.latlng.lat);
+                updateIputField(INPUT_LAT, event.latlng.lng);
+            });
         });
         myModal.show();
+
+        $("#select-area-for-rtsp").change(function () {
+            let lat = null;
+            let lng = null;
+            $("#select-area-for-rtsp option:selected").each(function () {
+                lat = $(this).attr('data-lat')
+                lng = $(this).attr('data-long')
+            });
+            pan_map(map, [lat, lng]);
+        });
     });
 
 
     areaGrid.on('plus-item', function (event) {
-        const MODAL_ID = 'areaModal';
+        const MODAL_ID = AREA_MODAL_ID;
         const MAP_ELEMENT_ID = 'area-map';
         const AREA_INFO = '#area-info';
         const INPUT_AREA_NAME = 'area_name'
@@ -144,6 +204,7 @@
 
         let myModal = createModal(MODAL_ID);
         let myModalEl = getElementOfModal(MODAL_ID)
+
 
         myModalEl.addEventListener('shown.bs.modal', function (event) {
             let mapOptions = {
@@ -189,7 +250,6 @@
             update_header(text)
         });
 
-        $('.basic-auto').autoComplete();
 
         $("form").submit(function (e) {
             e.preventDefault()
@@ -200,12 +260,44 @@
                 type: 'POST',
                 data: formData,
                 success: function (data) {
-                    console.log(data);
+                    if (data.error) {
+                        $(".toast-header span").html(ERROR_ICON)
+                        $(".toast-header strong").text(" Error")
+                        $(".toast").addClass("bg-danger")
+                    } else {
+                        $(".toast-header span").html(SUCCESS_ICON)
+                        $(".toast-header strong").text("Success")
+                        $(".toast").addClass("bg-success")
+                        let modal = getModal(AREA_MODAL_ID);
+                        if (modal == null){
+                            modal = getModal(RTSP_MODAL_ID)
+                            if(modal == null){
+                                modal = getModal(VIDEO_MODAL_ID)
+                            }
+                        }
+                        if (modal){
+                            modal.hide();
+                        }
+
+
+                        areaGrid.forceRender();
+                    }
+                    let output = "<ul>"
+                    data.msg.forEach(function (val) {
+                        output += "<li>" + val + "</li>";
+                    })
+                    output += "</ul>"
+                    $(".toast-body").html(output);
+                    let toastLiveExample = document.getElementById('liveToast')
+                    let toast = new bootstrap.Toast(toastLiveExample)
+
+                    toast.show()
                 },
                 cache: false,
                 contentType: false,
                 processData: false
-            });
+            })
+            ;
         });
     });
 </script>

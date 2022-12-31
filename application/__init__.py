@@ -51,7 +51,7 @@ def create_app():
     db.init_app(app)
 
     from .models import User
-    initialize_db(app, True, True)
+    initialize_db(app, False, False)
 
     # register login models and initialise Login Manager
     login_manager = LoginManager()
