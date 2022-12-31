@@ -38,14 +38,11 @@
 {{ input_field(field_id, 'password', name, label, 'Password' ) }}
 {% endmacro %}
 
-{% macro select_field_area(select_field_id1, extra_cls, label, name, options) %}
+{% macro select_field_area(select_field_id1, extra_cls, label, name, url) %}
 <div class="mb-3">
     <div class="form-floating">
-        <select id="{{ select_field_id1 }}" class="form-select" aria-label="{{ label }}" name="{{ name }}" required>
-            <option selected>Select an area</option>
-            {% for item in options %}
-            <option value="{{item['id']}}" data-lat="{{item.lat}}" data-long="{{item.lng}}">{{item['name']}}</option>
-            {% endfor %}
+        <select data-url="{{ url }}" id="{{ select_field_id1 }}" class="form-select basic-auto" aria-label="{{ label }}" name="{{ name }}" required>
+
         </select>
         <label for="{{ select_field_id1 }}" class="form-label">{{ label }}</label>
     </div>

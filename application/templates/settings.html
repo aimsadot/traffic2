@@ -99,8 +99,8 @@
     const rtspGrid = createGrid(RTSP_TABLE);
     const videoGrid = createGrid(VIDEO_TABLE);
 
-    videoGrid.on('plus-item', function (){
-         const MODAL_ID = 'videoModal';
+    videoGrid.on('plus-item', function () {
+        const MODAL_ID = 'videoModal';
         const MAP_ELEMENT_ID = 'video-map';
         let myModal = createModal(MODAL_ID);
         let myModalEl = getElementOfModal(MODAL_ID);
@@ -112,10 +112,10 @@
 
             addMap(MAP_ELEMENT_ID, mapOptions);
         });
-         myModal.show();
+        myModal.show();
     });
 
-    rtspGrid.on('plus-item', function (){
+    rtspGrid.on('plus-item', function () {
         const MODAL_ID = 'rtspModal';
         const MAP_ELEMENT_ID = 'rtsp-map';
         let myModal = createModal(MODAL_ID);
@@ -129,7 +129,7 @@
 
             addMap(MAP_ELEMENT_ID, mapOptions);
         });
-         myModal.show();
+        myModal.show();
     });
 
 
@@ -182,12 +182,31 @@
                 let text = get_data_card_header_text_of_tab($(tab));
                 update_header(text)
             }
-        })
+        });
 
         $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (event) {
             let text = get_data_card_header_text_of_tab($(event.target));
             update_header(text)
-        })
+        });
+
+        $('.basic-auto').autoComplete();
+
+        $("form").submit(function (e) {
+            e.preventDefault()
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: window.location.pathname,
+                type: 'POST',
+                data: formData,
+                success: function (data) {
+                    console.log(data);
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        });
     });
 </script>
 {%- endblock -%}
